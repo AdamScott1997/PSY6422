@@ -1,0 +1,166 @@
+---
+title: "PSY_6422"
+author: "Adam Scott"
+date: "24 May 2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+
+#Hiding unnecessary messages/errors
+knitr::opts_chunk$set(echo = TRUE,fig.show="hold",warning=FALSE,results=FALSE,message=FALSE)
+
+library(tidyverse) #library needed for data preparation functions
+library(ggplot2) #library needed for graph functions
+
+```
+
+
+## Out of reach for the younger generation? Changes in average house prices and incomes in England 1997-2019
+
+
+&nbsp;
+&nbsp;
+
+
+### Research Question
+Property prices in England have increased sharply over the last quarter of a century, with increases being most pronounced in the capital. Meanwhile, the average wage has grown at a slower rate. This project explores graphically how disparate these two aspects have become over the past 22 years.
+
+
+&nbsp;
+&nbsp;
+
+
+### Data origin
+Data used was firstly the median house price in London and England (inclusive of London) in Pound Sterling (£) calculated annually from the year ending September 1997 to the year ending September 2019. Secondly, it included the median gross annual workplace earnings in pound Sterling (£) - referred to as income - in London and England, calculated annually in April from 1997 to 2019. Finally, a house price to income ratio was produced by dividing the median house price of each region by the median income. This ratio acts as an indicator of relative affordability. A higher ratio indicates that it is on average less affordable for a resident to purchase a house in that region, whereas a lower ratio indicates it is on average more affordable. Please note there are many other factors that influence affordability, but this ratio acts as a useful if crude indication of affordability in a region.
+All data was obtained from a report by the Office for National Statistics, which is freely available on their [website](https://www.ons.gov.uk/peoplepopulationandcommunity/housing/datasets/ratioofhousepricetoworkplacebasedearningslowerquartileandmedian)
+
+
+&nbsp;
+&nbsp;
+
+
+### Data Preparation
+
+```{r data prep, results=TRUE}
+
+#data set up
+df <- read.csv("raw_data_PSY6422.csv")
+
+#tidying, changing type
+df$House.price <- as.numeric(gsub(",","",df$House.price))
+df$Income <- as.numeric(gsub(",","",df$Income))
+df$Year <- as.factor(df$Year)
+
+#displaying first few rows of raw data
+head(df) 
+
+```
+
+
+&nbsp;
+&nbsp;
+
+
+### Graph 1: Median house prices in London and England from 1997 to 2019
+
+```{r v_house.prices}
+
+#drawing a line graph with year on the x axis and median house price on the y axis, with two different colour lines representing England and London
+v1 <- ggplot(data=df, aes(x=Year, y=House.price, group=Region)) +
+  geom_line(aes(color=Region))+
+  labs(x = "Year", y = "Median House Price (£)" )+
+  theme(axis.text.x = element_text(angle=90, hjust = 1, size = 7))
+v1 + scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
+
+```
+
+This graph shows how the average cost of a house in England has increased dramatically since 1997. This trend is even more marked in the average price of a house in London, which increased particularly rapidly from 2012 onwards. 
+
+
+&nbsp;
+&nbsp;
+
+
+### Graph 2: Median annual workplace income in London and England from 1997 to 2019
+
+```{r v_income}
+
+#drawing a line graph with year on the x axis and median income on the y axis, with two different colour lines representing England and London
+v2 <- ggplot(data=df, aes(x=Year, y=Income, group=Region))+
+  geom_line(aes(color=Region))+
+  labs(x = "Year", y = "Median Annual Income (£)")+
+  theme(axis.text.x = element_text(angle=90, hjust = 1, size = 7))
+v2 + scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
+
+```
+
+From this graph we can also see how the average income has greatly increased from 1997 to 2019, almost doubling across both regions. Despite doubling this increase is substantially less than that of the increase in house prices in both regions.
+
+
+&nbsp;
+&nbsp;
+
+
+### Graph 3: Comparison of house price and income
+
+```{r V_combined}
+
+#drawing a line graph that has year as the x axis and £ as the y axis.
+#There are four lines, with colour disitnguishing region: london or england; and line type distinguishing data type: median house price or median income
+v3 <- ggplot(data=df, aes(x=Year, group=Region)) +
+  geom_line(aes(y=Income,color=Region,linetype="dashed"))+
+  geom_line(aes(y=House.price,color=Region,linetype="solid"))+
+  labs(x = "Year", y = "Pound Sterling (£)")+
+  scale_linetype_discrete(name = "Data Type (Median)", labels = c("Annual Income", "House Price"))+
+  theme(legend.title = element_text(size = 10))+
+  theme(axis.text.x = element_text(angle=90, hjust = 1, size = 7))
+v3 + scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
+
+```
+
+This graph enables us to see the how different the rate of increase has been between house prices and income between 1997 and 2019. The average house price has quadrupled whilst the average income almost doubled in England, with an even greater disparity in London.
+
+
+&nbsp;
+&nbsp;
+
+### Graph 4: House price to income ratio
+
+```{r v_affordability.ratio}
+
+#drawing a line graph with year on the x axis and house price to income ratio on the y axis, with two different colour lines representing England and London 
+v4 <- ggplot(data=df, aes(x=Year, y=House.price.to.income.ratio, group=Region)) +
+  geom_line(aes(color=Region))+
+  labs(x = "Year", y = "House Price to Income Ratio" )+
+  theme(axis.text.x = element_text(angle=90, hjust = 1, size = 7))
+v4 + scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
+
+```
+  
+This final graph shows how the house price to income ratio increased in both England and London from 1997 to 2019. We can see how this ratio has almost doubled for England and more than tripled for London. Used as a rough guide, this indicates that house prices are almost twice as unaffordable in England in 2019 compared to 1997, and three times more unaffordable in London in 2019 than in 1997.
+  
+&nbsp;
+&nbsp;
+
+
+### Discussion
+The graphs above visualise the growing disparity between the increase in average income compared to the increase in average house price. They also show how house prices have on average become increasingly unaffordable in England, especially so in the capital.
+This disparity has been linked to an increase in [private renting](https://www.ons.gov.uk/economy/inflationandpriceindices/articles/ukprivaterentedsector/2018) and a decrease in [homeownership among young adults](https://www.ifs.org.uk/uploads/publications/bns/BN224.pdf).
+There is much debate surrounding this increased divergence and many factors have been considered to have a causal role, for example the commodification and financialisation of housing and property discussed in [a 2017 report by the UN](https://documents-dds-ny.un.org/doc/UNDOC/GEN/G17/009/56/PDF/G1700956.pdf?OpenElement).
+Other potential determinants include a [substantial lack in housing supply versus demand](http://news.files.bbci.co.uk/include/newsspec/pdfs/bbc-briefing-housing-newsspec-26534.pdf) and the [stagnation of the average wage in real terms](https://fullfact.org/economy/employment-since-2010-wages/).
+Meanwhile, [proposed solutions](https://www.theguardian.com/society/2019/sep/27/innovative-solutions-to-the-uks-housing-crisis) to this problem [vary greatly](https://england.shelter.org.uk/__data/assets/pdf_file/0011/689447/Solutions_for_the_housing_shortage_-_FINAL.pdf) and are [hotly debated](https://housingevidence.ac.uk/wp-content/uploads/2019/08/20190820-CaCHE-Housing-Supply-FINAL.pdf).
+
+
+#### Limitations and future directions
+One limitation of these graphs is that the median house price and income for England included the data for London. Although this enables a snapshot of the data across the whole country, the addition of data for the rest of England not including London would allow us to see precisely how much the capital differs and more importantly the proportion of its contribution to the national changes for both data types.
+
+A significant limitation of the ability to draw generaliseable conclusions about the state of housing affordability is that this project does not consider the average cost of renting in England, which as mentioned earlier applies to an increasingly large percentage of the population. The dataset for this project also does not include the cost of socially rented housing, which also makes up a [considerable percentage of England's population](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/461439/EHS_Households_2013-14.pdf). The basis of a future project could be the examination and visualisation of how data from these two sectors of housing have changed over a similar time period.
+
+
+&nbsp;
+&nbsp;
+
+Repo for this analysis can be found [here](https://github.com/AdamScott1997/PSY6422)
